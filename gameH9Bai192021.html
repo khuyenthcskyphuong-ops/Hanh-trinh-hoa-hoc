@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KHTN 9 - Bài 19, 20, 21</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:linear-gradient(135deg,#062b48,#0d8cab);color:#17324a}
+main{max-width:980px;margin:auto;padding:20px}.panel{background:#fff8dc;border-radius:24px;padding:28px;box-shadow:0 16px 36px rgba(0,0,0,.3)}
+.hidden{display:none!important}h1,h2{text-align:center;margin:0 0 18px}.sub{text-align:center;font-weight:700;color:#82511d;line-height:1.6;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}label{display:block;font-weight:700;margin-bottom:7px}
+input{width:100%;padding:14px 16px;border:3px solid #d99a2b;border-radius:15px;font-size:18px}
+button{border:0;border-radius:15px;padding:14px 20px;font-size:18px;font-weight:800;cursor:pointer}
+.primary{background:linear-gradient(#ffd166,#ff9f1c);color:#713500;box-shadow:0 6px 0 #b85d00}.secondary{background:#1d3557;color:white}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px}.msg{text-align:center;margin-top:14px;color:#c1121f;font-weight:700}
+.top{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}.badge{background:#fff;border-radius:999px;padding:9px 14px;font-weight:700}
+.progress{height:14px;background:#d7e5e9;border-radius:999px;overflow:hidden;margin-bottom:22px}.progress div{height:100%;width:0;background:linear-gradient(90deg,#ffb703,#fb8500)}
+.q{font-size:22px;font-weight:700;line-height:1.45}.answers{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+.answer{background:#fff;border:3px solid #d9c78b;text-align:left;min-height:78px;color:#17324a}.answer.correct{background:#d8f3dc;border-color:#2a9d8f}.answer.wrong{background:#ffe5e5;border-color:#e63946}
+.ex{margin-top:18px;padding:14px;border-radius:14px;background:#fff3cd;border:1px solid #e2b900;line-height:1.5}
+.result{text-align:center}.score{font-size:62px;font-weight:900;color:#fb8500;margin:12px 0}.details{font-size:18px;line-height:1.8}
+footer{text-align:center;color:white;padding:16px;font-weight:700}@media(max-width:700px){.grid,.answers{grid-template-columns:1fr}.panel{padding:18px}.score{font-size:46px}}
+</style>
+</head>
+<body>
+<main>
+<section id="start" class="panel">
+<h1>⚗️ CHINH PHỤC THẾ GIỚI KIM LOẠI</h1>
+<div class="sub">KHTN 9 • Bài 19, 20, 21<br>© 2026 Cô Khuyên Hóa – Phạm Thị Lệ Khuyên</div>
+<div class="grid">
+<div><label for="name">Họ và tên học sinh</label><input id="name" placeholder="Nguyễn Văn A"></div>
+<div><label for="class">Lớp</label><input id="class" placeholder="9C"></div>
+</div>
+<div class="actions"><button id="startBtn" class="primary" type="button">BẮT ĐẦU THỬ THÁCH 🚀</button></div>
+<div id="msg" class="msg"></div>
+</section>
+
+<section id="quiz" class="panel hidden">
+<div class="top"><span id="player" class="badge"></span><span id="level" class="badge"></span><span id="scoreNow" class="badge"></span></div>
+<div class="progress"><div id="bar"></div></div>
+<h2 id="num"></h2><div id="qtext" class="q"></div><div id="answers" class="answers"></div>
+<div id="ex" class="ex hidden"></div><div class="actions"><button id="nextBtn" class="primary hidden" type="button">CÂU TIẾP THEO ➜</button></div>
+</section>
+
+<section id="result" class="panel hidden result">
+<h1>🏆 HOÀN THÀNH THỬ THÁCH</h1><div id="finalScore" class="score"></div><div id="details" class="details"></div>
+<div class="actions"><button id="sendBtn" class="primary" type="button">📤 GỬI KẾT QUẢ</button><button id="restartBtn" class="secondary" type="button">LÀM LẠI</button></div><div id="sendStatus" style="margin-top:16px;font-weight:700;min-height:24px"></div>
+</section>
+</main>
+<footer>© 2026 Cô Khuyên Hóa – Phạm Thị Lệ Khuyên</footer>
+<script>
+"use strict";
+const QUESTIONS=[{"level": "Nhận biết", "q": "Trong dãy hoạt động hóa học, kim loại đứng càng về phía trước thì", "opts": ["hoạt động hóa học càng mạnh", "hoạt động hóa học càng yếu", "không phản ứng với acid", "chỉ phản ứng với oxygen"], "ans": 0, "ex": "Kim loại đứng trước hoạt động hóa học mạnh hơn kim loại đứng sau."}, {"level": "Nhận biết", "q": "Kim loại nào sau đây đứng trước hydrogen trong dãy hoạt động hóa học?", "opts": ["Cu", "Zn", "Ag", "Au"], "ans": 1, "ex": "Zn đứng trước H nên có thể phản ứng với hydrochloric acid loãng."}, {"level": "Nhận biết", "q": "Kim loại nào sau đây không phản ứng với hydrochloric acid loãng?", "opts": ["Mg", "Al", "Cu", "Zn"], "ans": 2, "ex": "Cu đứng sau H trong dãy hoạt động nên không đẩy được H khỏi acid loãng."}, {"level": "Nhận biết", "q": "Phản ứng nào sau đây có thể xảy ra?", "opts": ["Cu + ZnSO₄", "Ag + CuSO₄", "Au + HCl", "Zn + CuSO₄"], "ans": 3, "ex": "Zn hoạt động mạnh hơn Cu nên đẩy Cu khỏi dung dịch CuSO₄."}, {"level": "Nhận biết", "q": "Phương pháp thường dùng để tách kim loại hoạt động mạnh như sodium là", "opts": ["điện phân hợp chất nóng chảy", "dùng carbon khử oxide", "nhiệt phân muối", "dùng hydrogen khử oxide"], "ans": 0, "ex": "Kim loại hoạt động mạnh thường được điều chế bằng điện phân nóng chảy."}, {"level": "Nhận biết", "q": "Hợp kim là", "opts": ["một kim loại nguyên chất", "vật liệu kim loại gồm một kim loại chính và một hay nhiều nguyên tố khác", "một phi kim tinh khiết", "một dung dịch muối"], "ans": 1, "ex": "Hợp kim có tính chất khác và thường tốt hơn kim loại nguyên chất."}, {"level": "Nhận biết", "q": "Tính chất vật lí đặc trưng của kim loại là", "opts": ["giòn, không dẫn điện", "không có ánh kim", "dẫn điện, dẫn nhiệt tốt", "luôn ở thể khí"], "ans": 2, "ex": "Kim loại thường có ánh kim, dẫn điện, dẫn nhiệt và có tính dẻo."}, {"level": "Nhận biết", "q": "Phi kim nào sau đây dẫn điện tốt?", "opts": ["sulfur", "oxygen", "chlorine", "graphite"], "ans": 3, "ex": "Graphite là dạng thù hình của carbon có khả năng dẫn điện."}, {"level": "Thông hiểu", "q": "Vì sao zinc có thể đẩy copper ra khỏi dung dịch copper(II) sulfate?", "opts": ["Vì zinc hoạt động hóa học mạnh hơn copper", "Vì copper tan tốt hơn zinc", "Vì zinc nhẹ hơn copper", "Vì dung dịch có màu xanh"], "ans": 0, "ex": "Kim loại đứng trước đẩy được kim loại đứng sau ra khỏi dung dịch muối."}, {"level": "Thông hiểu", "q": "Cho iron vào dung dịch copper(II) sulfate, hiện tượng đúng là", "opts": ["không có hiện tượng", "có lớp copper đỏ bám ngoài iron, màu xanh dung dịch nhạt dần", "iron tan và có khí thoát ra", "xuất hiện kết tủa trắng"], "ans": 1, "ex": "Fe đẩy Cu ra khỏi CuSO₄ tạo Cu màu đỏ và FeSO₄."}, {"level": "Thông hiểu", "q": "Kim loại nào có thể dùng để loại ion Cu²⁺ khỏi dung dịch mà không đưa thêm kim loại độc hại?", "opts": ["Ag", "Au", "Fe", "Cu"], "ans": 2, "ex": "Fe hoạt động mạnh hơn Cu nên đẩy được Cu²⁺ thành Cu."}, {"level": "Thông hiểu", "q": "Vì sao aluminium được dùng làm vật liệu chế tạo máy bay?", "opts": ["Vì aluminium rất nặng", "Vì aluminium không dẫn điện", "Vì aluminium luôn không phản ứng", "Vì aluminium nhẹ và hợp kim của nó khá bền"], "ans": 3, "ex": "Aluminium có khối lượng riêng nhỏ và hợp kim có độ bền tốt."}, {"level": "Thông hiểu", "q": "Phương pháp dùng carbon khử metal oxide thích hợp nhất với kim loại", "opts": ["đứng sau aluminium trong dãy hoạt động", "đứng trước potassium", "hoạt động rất mạnh", "chỉ có trong tự nhiên ở dạng đơn chất"], "ans": 0, "ex": "Các kim loại hoạt động trung bình, đứng sau Al, thường có thể điều chế bằng nhiệt luyện."}, {"level": "Thông hiểu", "q": "So với phi kim, kim loại thường", "opts": ["dẫn điện kém hơn", "dẫn điện và dẫn nhiệt tốt hơn", "giòn hơn trong mọi trường hợp", "không có ánh kim"], "ans": 1, "ex": "Khả năng dẫn điện và dẫn nhiệt là điểm khác biệt nổi bật của kim loại."}, {"level": "Vận dụng", "q": "Cho 5,6 g iron phản ứng hoàn toàn với dung dịch copper(II) sulfate dư. Khối lượng copper thu được là bao nhiêu? (Fe = 56; Cu = 64)", "opts": ["5,6 g", "6,0 g", "6,4 g", "12,0 g"], "ans": 2, "ex": "Fe + CuSO₄ → FeSO₄ + Cu. nFe = 5,6/56 = 0,1 mol ⇒ nCu = 0,1 mol ⇒ mCu = 6,4 g."}, {"level": "Vận dụng", "q": "Cho 6,5 g zinc phản ứng hoàn toàn với dung dịch copper(II) sulfate dư. Khối lượng copper thu được là", "opts": ["3,2 g", "5,6 g", "6,0 g", "6,4 g"], "ans": 3, "ex": "Zn + CuSO₄ → ZnSO₄ + Cu. nZn = 6,5/65 = 0,1 mol ⇒ mCu = 0,1×64 = 6,4 g."}, {"level": "Vận dụng", "q": "Cho 11,2 g iron phản ứng hoàn toàn với hydrochloric acid dư. Thể tích hydrogen ở điều kiện tiêu chuẩn là", "opts": ["4,48 L", "2,24 L", "6,72 L", "11,2 L"], "ans": 0, "ex": "Fe + 2HCl → FeCl₂ + H₂. nFe = 0,2 mol ⇒ nH₂ = 0,2 mol ⇒ V = 4,48 L."}, {"level": "Vận dụng", "q": "Kim loại X đứng sau Mg nhưng đứng trước Cu. X có thể là", "opts": ["Ag", "Fe", "Au", "Hg"], "ans": 1, "ex": "Trong dãy hoạt động, Fe đứng sau Mg và trước Cu."}, {"level": "Vận dụng cao", "q": "Nhúng một đinh iron vào dung dịch CuSO₄. Sau phản ứng, khối lượng đinh tăng 0,8 g. Khối lượng copper bám lên đinh là bao nhiêu? (Fe = 56; Cu = 64)", "opts": ["3,2 g", "5,6 g", "6,4 g", "12,8 g"], "ans": 2, "ex": "Fe + CuSO₄ → FeSO₄ + Cu. Mỗi 1 mol Fe tan làm đinh tăng 64−56=8 g. Tăng 0,8 g ⇒ 0,1 mol phản ứng ⇒ mCu=6,4 g."}, {"level": "Vận dụng cao", "q": "Cho 13 g zinc vào 200 mL dung dịch AgNO₃ 1 M. Khối lượng silver tối đa thu được là bao nhiêu? (Zn = 65; Ag = 108)", "opts": ["10,8 g", "16,2 g", "21,6 g", "43,2 g"], "ans": 2, "ex": "Zn + 2AgNO₃ → Zn(NO₃)₂ + 2Ag. nZn=0,2 mol; nAgNO₃=0,2 mol nên AgNO₃ giới hạn ⇒ nAg=0,2 mol ⇒ mAg=21,6 g."}];
+const $=id=>document.getElementById(id);
+let i=0,correct=0,locked=false,name="",cls="",started=0,point=0,resultTime="";
+function show(id){["start","quiz","result"].forEach(x=>$(x).classList.toggle("hidden",x!==id));}
+function startGame(){name=$("name").value.trim();cls=$("class").value.trim();if(!name||!cls){$("msg").textContent="Vui lòng nhập đầy đủ họ tên và lớp.";return;}
+$("msg").textContent="";i=0;correct=0;started=Date.now();show("quiz");render();}
+function render(){locked=false;const q=QUESTIONS[i];$("player").textContent=name+" • "+cls;$("level").textContent=q.level;$("scoreNow").textContent="Đúng: "+correct+"/"+QUESTIONS.length;
+$("bar").style.width=((i/QUESTIONS.length)*100)+"%";$("num").textContent="Câu "+(i+1)+"/"+QUESTIONS.length;$("qtext").textContent=q.q;$("answers").innerHTML="";
+$("ex").classList.add("hidden");$("nextBtn").classList.add("hidden");
+q.opts.forEach((o,k)=>{const b=document.createElement("button");b.type="button";b.className="answer";b.textContent=String.fromCharCode(65+k)+". "+o;b.addEventListener("click",()=>choose(k,b));$("answers").appendChild(b);});}
+function choose(k,b){if(locked)return;locked=true;const q=QUESTIONS[i],bs=[...document.querySelectorAll(".answer")];bs.forEach(x=>x.disabled=true);bs[q.ans].classList.add("correct");
+if(k===q.ans)correct++;else b.classList.add("wrong");$("scoreNow").textContent="Đúng: "+correct+"/"+QUESTIONS.length;$("ex").textContent=(k===q.ans?"✅ Chính xác. ":"❌ Chưa đúng. ")+q.ex;
+$("ex").classList.remove("hidden");$("nextBtn").textContent=i===QUESTIONS.length-1?"XEM KẾT QUẢ 🏁":"CÂU TIẾP THEO ➜";$("nextBtn").classList.remove("hidden");}
+function next(){i++;if(i>=QUESTIONS.length)finish();else render();}
+function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+function finish(){const sec=Math.max(1,Math.round((Date.now()-started)/1000)),m=Math.floor(sec/60),s=sec%60;point=Math.round(correct/QUESTIONS.length*100)/10;
+resultTime=m+" phút "+s+" giây";$("finalScore").textContent=point+"/10";$("details").innerHTML="<b>"+esc(name)+"</b> – Lớp <b>"+esc(cls)+"</b><br>Số câu đúng: <b>"+correct+"/"+QUESTIONS.length+"</b><br>Thời gian: <b>"+resultTime+"</b>";$("sendStatus").textContent="";$("sendBtn").disabled=false;$("sendBtn").textContent="📤 GỬI KẾT QUẢ";show("result");}
+async function send(){
+  const button=$("sendBtn");
+  const status=$("sendStatus");
+  button.disabled=true;
+  button.textContent="ĐANG GỬI...";
+  status.style.color="#1d3557";
+  status.textContent="Đang gửi kết quả đến cô Khuyên...";
+
+  const data=new URLSearchParams();
+  data.append("hoTen",name);
+  data.append("lop",cls);
+  data.append("tenGame","KHTN 9 - Bài 19, 20, 21");
+  data.append("diem",String(point));
+  data.append("soCauDung",String(correct));
+  data.append("thoiGianLam",resultTime);
+
+  try{
+    await fetch("https://script.google.com/macros/s/AKfycbzlhz7P0YTImfPMLhfB_rICJcIhK9vX0Z5kfLSHLlH6UejcM-U_IM_wQ8pzrnDIeRCP/exec",{
+      method:"POST",
+      mode:"no-cors",
+      headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},
+      body:data.toString()
+    });
+    status.style.color="#198754";
+    status.textContent="✅ Đã gửi kết quả thành công!";
+    button.textContent="✅ ĐÃ GỬI";
+  }catch(error){
+    status.style.color="#c1121f";
+    status.textContent="❌ Chưa gửi được. Hãy kiểm tra Internet và thử lại.";
+    button.disabled=false;
+    button.textContent="📤 GỬI LẠI KẾT QUẢ";
+  }
+}
+$("startBtn").addEventListener("click",startGame);$("nextBtn").addEventListener("click",next);$("sendBtn").addEventListener("click",send);$("restartBtn").addEventListener("click",()=>show("start"));
+$("class").addEventListener("keydown",e=>{if(e.key==="Enter")startGame();});
+</script>
+</body></html>
