@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KHTN 8 - Bài 2 và Bài 5</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:linear-gradient(135deg,#053b5c,#1597b8);color:#17324a}
+main{max-width:960px;margin:auto;padding:20px}
+.panel{background:#fff8dc;border-radius:24px;padding:28px;box-shadow:0 16px 35px rgba(0,0,0,.28)}
+.hidden{display:none}
+h1,h2{text-align:center;margin:0 0 18px}
+.subtitle{text-align:center;font-weight:700;color:#87511e;margin-bottom:24px;line-height:1.6}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+label{display:block;font-weight:700;margin-bottom:7px}
+input{width:100%;padding:14px 16px;border:3px solid #d99a2b;border-radius:15px;font-size:18px;background:#fff}
+button{font:inherit;border:none;border-radius:15px;padding:14px 20px;font-weight:800;cursor:pointer}
+.primary{background:linear-gradient(#ffd166,#ff9f1c);color:#7b3900;box-shadow:0 6px 0 #b85d00}
+.secondary{background:#1d3557;color:#fff}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.message{text-align:center;margin-top:14px;font-weight:700;color:#c1121f}
+.top{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}
+.badge{background:#fff;border-radius:999px;padding:9px 14px;font-weight:700}
+.progress{height:14px;background:#d7e5e9;border-radius:999px;overflow:hidden;margin-bottom:22px}
+.progress div{height:100%;background:linear-gradient(90deg,#ffb703,#fb8500);width:0}
+.question{font-size:22px;font-weight:700;line-height:1.45}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+.answer{background:#fff;border:3px solid #d9c78b;text-align:left;min-height:78px;color:#17324a}
+.answer.correct{background:#d8f3dc;border-color:#2a9d8f}
+.answer.wrong{background:#ffe5e5;border-color:#e63946}
+.explanation{margin-top:18px;padding:14px;border-radius:14px;background:#fff3cd;border:1px solid #e2b900;line-height:1.5}
+.result{text-align:center}
+.score{font-size:62px;font-weight:900;color:#fb8500;margin:12px 0}
+.details{font-size:18px;line-height:1.8}
+footer{text-align:center;color:#fff;padding:16px;font-weight:700}
+@media(max-width:700px){.form-grid,.answers{grid-template-columns:1fr}.panel{padding:18px}.score{font-size:46px}}
+</style>
+</head>
+<body>
+<main>
+<section id="screenStart" class="panel">
+<h1>🧪 HÀNH TRÌNH PHẢN ỨNG HÓA HỌC</h1>
+<div class="subtitle">KHTN 8 • Bài 2 và Bài 5<br>© 2026 Cô Khuyên Hóa – Phạm Thị Lệ Khuyên</div>
+<div class="form-grid">
+<div><label for="nameInput">Họ và tên học sinh</label><input id="nameInput" autocomplete="name" placeholder="Nguyễn Văn A"></div>
+<div><label for="classInput">Lớp</label><input id="classInput" placeholder="8C"></div>
+</div>
+<div class="actions"><button id="startButton" type="button" class="primary">BẮT ĐẦU THỬ THÁCH 🚀</button></div>
+<div id="startMessage" class="message"></div>
+</section>
+
+<section id="screenQuiz" class="panel hidden">
+<div class="top">
+<span id="playerInfo" class="badge"></span>
+<span id="levelInfo" class="badge"></span>
+<span id="scoreInfo" class="badge"></span>
+</div>
+<div class="progress"><div id="progressFill"></div></div>
+<h2 id="questionNumber"></h2>
+<div id="questionText" class="question"></div>
+<div id="answerList" class="answers"></div>
+<div id="explanation" class="explanation hidden"></div>
+<div class="actions"><button id="nextButton" type="button" class="primary hidden">CÂU TIẾP THEO ➜</button></div>
+</section>
+
+<section id="screenResult" class="panel hidden result">
+<h1>🏆 HOÀN THÀNH THỬ THÁCH</h1>
+<div id="finalScore" class="score"></div>
+<div id="finalDetails" class="details"></div>
+<div class="actions">
+<button id="sendButton" type="button" class="primary">📤 GỬI KẾT QUẢ</button>
+<button id="restartButton" type="button" class="secondary">LÀM LẠI</button>
+</div>
+<div id="sendStatus" style="margin-top:16px;font-weight:700;min-height:24px"></div>
+</section>
+</main>
+<footer>© 2026 Cô Khuyên Hóa – Phạm Thị Lệ Khuyên</footer>
+
+<script>
+"use strict";
+const QUESTIONS = [{"level": "Nhận biết", "q": "Phản ứng hóa học là quá trình nào sau đây?", "opts": ["Biến đổi chất này thành chất khác", "Làm chất thay đổi trạng thái nhưng không tạo chất mới", "Làm vật thay đổi hình dạng", "Hòa tan chất rắn vào nước"], "ans": 0, "ex": "Phản ứng hóa học là quá trình biến đổi chất ban đầu thành chất mới."}, {"level": "Nhận biết", "q": "Trong phản ứng hóa học, chất có mặt trước phản ứng gọi là gì?", "opts": ["Sản phẩm", "Chất phản ứng", "Dung môi", "Chất chỉ thị"], "ans": 1, "ex": "Chất phản ứng là những chất tham gia phản ứng."}, {"level": "Nhận biết", "q": "Chất tạo thành sau phản ứng hóa học được gọi là gì?", "opts": ["Chất phản ứng", "Hỗn hợp", "Sản phẩm", "Dung môi"], "ans": 2, "ex": "Sản phẩm là chất mới được tạo thành sau phản ứng."}, {"level": "Nhận biết", "q": "Dấu hiệu nào thường cho thấy phản ứng hóa học đã xảy ra?", "opts": ["Vật bị cắt nhỏ", "Chất bị nghiền vụn", "Nước bay hơi", "Xuất hiện khí, kết tủa hoặc sự đổi màu"], "ans": 3, "ex": "Khí, kết tủa, đổi màu hoặc thay đổi nhiệt độ là những dấu hiệu thường gặp."}, {"level": "Nhận biết", "q": "Hiện tượng nào sau đây là biến đổi hóa học?", "opts": ["Sắt bị gỉ", "Nước đá tan", "Cắt tờ giấy", "Uốn dây đồng"], "ans": 0, "ex": "Sắt gỉ tạo thành chất mới."}, {"level": "Nhận biết", "q": "Hiện tượng nào sau đây là biến đổi vật lí?", "opts": ["Đốt cháy than", "Nước sôi và bay hơi", "Trứng luộc chín", "Sữa bị chua"], "ans": 1, "ex": "Nước bay hơi không tạo thành chất mới."}, {"level": "Nhận biết", "q": "Định luật bảo toàn khối lượng được phát biểu như thế nào?", "opts": ["Khối lượng sản phẩm luôn lớn hơn chất phản ứng", "Khối lượng chất phản ứng luôn lớn hơn sản phẩm", "Tổng khối lượng chất phản ứng bằng tổng khối lượng sản phẩm", "Khối lượng từng chất không thay đổi"], "ans": 2, "ex": "Trong phản ứng hóa học, tổng khối lượng trước và sau phản ứng bằng nhau."}, {"level": "Nhận biết", "q": "Biểu thức nào đúng với định luật bảo toàn khối lượng?", "opts": ["m chất phản ứng < m sản phẩm", "m chất phản ứng > m sản phẩm", "m từng chất trước = m từng chất sau", "Tổng m chất phản ứng = tổng m sản phẩm"], "ans": 3, "ex": "Định luật áp dụng cho tổng khối lượng của tất cả các chất."}, {"level": "Nhận biết", "q": "Trong phản ứng magnesium + oxygen → magnesium oxide, các chất phản ứng là", "opts": ["magnesium và oxygen", "magnesium oxide", "oxygen và magnesium oxide", "chỉ magnesium"], "ans": 0, "ex": "Magnesium và oxygen là hai chất tham gia phản ứng."}, {"level": "Nhận biết", "q": "Khi carbon cháy trong oxygen tạo carbon dioxide, carbon dioxide là", "opts": ["chất phản ứng", "sản phẩm", "chất xúc tác", "dung môi"], "ans": 1, "ex": "Carbon dioxide là chất mới tạo thành."}, {"level": "Thông hiểu", "q": "Vì sao khối lượng được bảo toàn trong phản ứng hóa học?", "opts": ["Vì nguyên tử mới được sinh ra", "Vì một số nguyên tử bị mất đi", "Vì các nguyên tử chỉ sắp xếp lại, không tự sinh ra hoặc mất đi", "Vì sản phẩm luôn là chất rắn"], "ans": 2, "ex": "Số nguyên tử mỗi nguyên tố được bảo toàn, chúng chỉ thay đổi cách liên kết."}, {"level": "Thông hiểu", "q": "Đốt giấy ngoài không khí thấy khối lượng tro nhỏ hơn khối lượng giấy. Giải thích đúng là", "opts": ["Định luật bảo toàn khối lượng không đúng", "Một phần chất đã biến mất hoàn toàn", "Khối lượng giấy ban đầu bị sai", "Một số sản phẩm khí bay ra ngoài nên chưa được cân"], "ans": 3, "ex": "Cần tính cả sản phẩm khí mới kiểm chứng được định luật."}, {"level": "Thông hiểu", "q": "Cho baking soda vào giấm thấy sủi bọt. Dấu hiệu rõ nhất của phản ứng là", "opts": ["Có khí được tạo thành", "Dung dịch bị khuấy", "Cốc bị rung", "Chất rắn bị chia nhỏ"], "ans": 0, "ex": "Các bọt khí chứng tỏ có chất khí mới sinh ra."}, {"level": "Thông hiểu", "q": "Trường hợp nào chứng tỏ có chất mới tạo thành?", "opts": ["Nước đông thành đá", "Dung dịch trong suốt xuất hiện kết tủa trắng", "Cồn bay hơi", "Muối tan trong nước"], "ans": 1, "ex": "Kết tủa là chất mới không tan được tạo thành."}, {"level": "Thông hiểu", "q": "Trong bình kín, 5,6 g iron phản ứng vừa đủ với 3,2 g sulfur. Khối lượng iron sulfide thu được là", "opts": ["2,4 g", "5,6 g", "8,8 g", "17,92 g"], "ans": 2, "ex": "m sản phẩm = 5,6 + 3,2 = 8,8 g."}, {"level": "Thông hiểu", "q": "Có 12 g chất A và 8 g chất B phản ứng tạo 15 g chất C và chất D. Khối lượng chất D là", "opts": ["3 g", "4 g", "5 g", "35 g"], "ans": 2, "ex": "mD = 12 + 8 − 15 = 5 g."}, {"level": "Vận dụng", "q": "Đốt cháy hoàn toàn 6 g magnesium, thu được 10 g magnesium oxide. Khối lượng oxygen đã phản ứng là", "opts": ["4 g", "6 g", "10 g", "16 g"], "ans": 0, "ex": "m oxygen = 10 − 6 = 4 g."}, {"level": "Vận dụng", "q": "Cho 13 g zinc phản ứng với hydrochloric acid, thu được 27,2 g zinc chloride và 0,4 g hydrogen. Khối lượng hydrochloric acid đã phản ứng là", "opts": ["13,8 g", "14,6 g", "27,6 g", "40,6 g"], "ans": 1, "ex": "m acid = 27,2 + 0,4 − 13 = 14,6 g."}, {"level": "Vận dụng cao", "q": "Trong bình kín có tổng cộng 11 g hydrogen và oxygen. Sau phản ứng thu được 9 g nước. Khối lượng chất còn dư là", "opts": ["0 g", "1 g", "2 g", "11 g"], "ans": 2, "ex": "Khối lượng còn dư = 11 − 9 = 2 g."}, {"level": "Vận dụng cao", "q": "Nung 25 g calcium carbonate thu được 14 g calcium oxide và carbon dioxide. Khối lượng carbon dioxide là", "opts": ["9 g", "10 g", "11 g", "39 g"], "ans": 2, "ex": "m carbon dioxide = 25 − 14 = 11 g."}];
+const byId = (id) => document.getElementById(id);
+
+let currentIndex = 0;
+let correctCount = 0;
+let answered = false;
+let studentName = "";
+let studentClass = "";
+let startTime = null;
+let finalPoint = 0;
+let resultTime = "";
+
+function showOnly(screenId){
+  ["screenStart","screenQuiz","screenResult"].forEach(function(id){
+    byId(id).classList.toggle("hidden", id !== screenId);
+  });
+}
+
+function startGame(){
+  studentName = byId("nameInput").value.trim();
+  studentClass = byId("classInput").value.trim();
+  if(!studentName || !studentClass){
+    byId("startMessage").textContent = "Vui lòng nhập đầy đủ họ tên và lớp.";
+    return;
+  }
+  byId("startMessage").textContent = "";
+  currentIndex = 0;
+  correctCount = 0;
+  answered = false;
+  startTime = Date.now();
+  showOnly("screenQuiz");
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const item = QUESTIONS[currentIndex];
+  answered = false;
+  byId("playerInfo").textContent = studentName + " • " + studentClass;
+  byId("levelInfo").textContent = item.level;
+  byId("scoreInfo").textContent = "Đúng: " + correctCount + "/" + QUESTIONS.length;
+  byId("progressFill").style.width = ((currentIndex / QUESTIONS.length) * 100) + "%";
+  byId("questionNumber").textContent = "Câu " + (currentIndex + 1) + "/" + QUESTIONS.length;
+  byId("questionText").textContent = item.q;
+  byId("explanation").classList.add("hidden");
+  byId("nextButton").classList.add("hidden");
+  byId("answerList").innerHTML = "";
+
+  item.opts.forEach(function(option, index){
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "answer";
+    button.textContent = String.fromCharCode(65 + index) + ". " + option;
+    button.addEventListener("click", function(){ selectAnswer(index, button); });
+    byId("answerList").appendChild(button);
+  });
+}
+
+function selectAnswer(index, selectedButton){
+  if(answered) return;
+  answered = true;
+  const item = QUESTIONS[currentIndex];
+  const buttons = Array.from(document.querySelectorAll(".answer"));
+
+  buttons.forEach(function(button){ button.disabled = true; });
+  buttons[item.ans].classList.add("correct");
+
+  if(index === item.ans){
+    correctCount += 1;
+  } else {
+    selectedButton.classList.add("wrong");
+  }
+
+  byId("scoreInfo").textContent = "Đúng: " + correctCount + "/" + QUESTIONS.length;
+  byId("explanation").textContent =
+    (index === item.ans ? "✅ Chính xác. " : "❌ Chưa đúng. ") + item.ex;
+  byId("explanation").classList.remove("hidden");
+  byId("nextButton").textContent =
+    currentIndex === QUESTIONS.length - 1 ? "XEM KẾT QUẢ 🏁" : "CÂU TIẾP THEO ➜";
+  byId("nextButton").classList.remove("hidden");
+}
+
+function nextQuestion(){
+  currentIndex += 1;
+  if(currentIndex >= QUESTIONS.length){
+    finishGame();
+  } else {
+    renderQuestion();
+  }
+}
+
+function finishGame(){
+  const elapsedSeconds = Math.max(1, Math.round((Date.now() - startTime) / 1000));
+  const minutes = Math.floor(elapsedSeconds / 60);
+  const seconds = elapsedSeconds % 60;
+  finalPoint = Math.round((correctCount / QUESTIONS.length) * 100) / 10;
+
+  byId("progressFill").style.width = "100%";
+  byId("finalScore").textContent = finalPoint + "/10";
+  byId("finalDetails").innerHTML =
+    "<b>" + escapeHtml(studentName) + "</b> – Lớp <b>" + escapeHtml(studentClass) + "</b><br>" +
+    "Số câu đúng: <b>" + correctCount + "/" + QUESTIONS.length + "</b><br>" +
+    "Thời gian làm bài: <b>" + minutes + " phút " + seconds + " giây</b>";
+  showOnly("screenResult");
+}
+
+function escapeHtml(value){
+  return value.replace(/[&<>"']/g, function(char){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char];
+  });
+}
+
+async function sendResult(){
+  const button = byId("sendButton");
+  const status = byId("sendStatus");
+
+  button.disabled = true;
+  button.textContent = "ĐANG GỬI...";
+  status.style.color = "#1d3557";
+  status.textContent = "Đang gửi kết quả đến cô Khuyên...";
+
+  const data = new URLSearchParams();
+  data.append("hoTen", studentName);
+  data.append("lop", studentClass);
+  data.append("tenGame", "KHTN 8 - Bài 2 và Bài 5");
+  data.append("diem", String(result.dataset.score));
+  data.append("soCauDung", String(correct));
+  data.append("thoiGianLam", resultTime);
+
+  try {
+    await fetch("https://script.google.com/macros/s/AKfycbzlhz7P0YTImfPMLhfB_rICJcIhK9vX0Z5kfLSHLlH6UejcM-U_IM_wQ8pzrnDIeRCP/exec", {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+      },
+      body: data.toString()
+    });
+
+    status.style.color = "#198754";
+    status.textContent = "✅ Đã gửi kết quả thành công!";
+    button.textContent = "✅ ĐÃ GỬI";
+  } catch (error) {
+    status.style.color = "#c1121f";
+    status.textContent = "❌ Chưa gửi được. Hãy kiểm tra Internet và thử lại.";
+    button.disabled = false;
+    button.textContent = "📤 GỬI LẠI KẾT QUẢ";
+  }
+}
+
+function restartGame(){
+  showOnly("screenStart");
+  byId("startMessage").textContent = "";
+}
+
+byId("startButton").addEventListener("click", startGame);
+byId("nextButton").addEventListener("click", nextQuestion);
+byId("sendButton").addEventListener("click", sendResult);
+byId("restartButton").addEventListener("click", restartGame);
+byId("classInput").addEventListener("keydown", function(event){
+  if(event.key === "Enter") startGame();
+});
+</script>
+</body>
+</html>
